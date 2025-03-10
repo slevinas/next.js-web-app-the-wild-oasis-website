@@ -4,7 +4,10 @@ import { updateProfile } from "@/app/_lib/actions";
 import Image from "next/image";
 import React, { useState } from "react";
 import { useFormStatus } from "react-dom";
+
+
 function UpdateProfileForm({ guest, countries }) {
+  // console.log("from UpdateProfileForm countries:", countries);
   // console.log("from UpdateProfileForm guest:", guest);
   // const countryFlag = "/pt.jpg";
   // const nationality = "portugal";
@@ -46,14 +49,16 @@ function UpdateProfileForm({ guest, countries }) {
         <div className="space-y-2">
           <div className="flex items-center justify-between ">
             <label htmlFor="nationality">Where are you from?</label>
-            <div className="flex relative h-5 w-8 ml-3">
-              <Image
-                fill
-                src={selectedCountry.split("%")[1]}
-                alt="Country flag"
-                className="h-5 rounded-sm object-cover"
-              />
-            </div>
+            {selectedCountry.split("%")[1] ? (
+              <div className="flex relative h-5 w-8 ml-3">
+                <Image
+                  fill
+                  src={selectedCountry.split("%")[1]}
+                  alt="Country flag"
+                  className="h-5 rounded-sm object-cover"
+                />
+              </div>
+            ) : null}
           </div>
 
           <select
