@@ -55,54 +55,23 @@ const authConfig = {
     async signIn({ user }) {
       try {
         const guestInfo = await getOrCreateGuest(user.email, user.name);
-        console.log("Sign-in successful for guest:", guestInfo);
+
+        if (!guestInfo) {
+          throw new Error("Guest could not be found or created");
+        }
+        // Add the guest ID to the user object for the jwt callback
+        user.guestId = guestInfo.id;
         return true;
       } catch (error) {
         console.error("Sign-in error:", error.message);
         return false;
       }
     },
-    async session({ session, token }) {
-      try {
-        if (!session?.user?.email) {
-          throw new Error("Session user email is missing");
-        }
-        const guestInfo = await getOrCreateGuest(
-          session.user.email,
-          session.user.name
-        );
-        console.log(
-          "Fetched guest ID:",
-          guestInfo.id,
-          "Type:",
-          typeof guestInfo.id
-        );
-        // Ensure the guest ID is a BIGINT and not a UUID
-        const guestId = Number(guestInfo.id);
-        if (isNaN(guestId)) {
-          console.error(
-            "Invalid guest ID format. Expected a BIGINT, received:",
-            guestInfo.id
-          );
-          return null;
-        }
-
-        session.user.guestId = guestId;
-        session.user.role = "guest";
-        session.user.id = guestId;
-
-        console.log("Session created with BIGINT ID:", session);
-        return session;
-      } catch (error) {
-        console.error("Session error:", error.message);
-        return null;
-      }
-    },
     async jwt({ token, user }) {
       if (user) {
-        const userId = parseInt(user.id, 10);
-        if (!isNaN(userId)) {
-          token.id = userId;
+        const guestId = parseInt(user.guestId, 10);
+        if (!isNaN(guestId)) {
+          token.id = guestId;
           token.role = "guest";
         } else {
           console.error(
@@ -113,9 +82,24 @@ const authConfig = {
       }
       return token;
     },
+    async session({ session, token }) {
+      try {
+        if (!token?.id || !token?.role) {
+          throw new Error("Token is missing required properties.");
+        }
+
+        session.user.guestId = token.id; // Use the ID from the token
+        session.user.role = token.role; // Use the role from the token
+
+        return session;
+      } catch (error) {
+        console.error("Session error:", error.message);
+        return null;
+      }
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV !== "production",
+  // debug: process.env.NODE_ENV !== "production",
   pages: {
     signIn: "/login",
     error: "/login", // Redirect to login page on error

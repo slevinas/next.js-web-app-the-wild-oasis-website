@@ -63,7 +63,7 @@ export async function getGuestByEmail(email) {
     .single();
 
   // No error here! We handle the possibility of no guest in the sign in callback
-  // console.log("from data-service getGuestByEmail ", data);
+
   return data;
 }
 
@@ -96,22 +96,13 @@ export async function getReservationById(id) {
 }
 
 export async function getBookings(guestId) {
-  // console.log("from data-service getBookings guestId", guestId);
-  // const { data, error, count } = await supabase
-  //   .from("bookings")
-  //   // We actually also need data on the cabins as well. But let's ONLY take the data that we actually need, in order to reduce downloaded data.
-  //   .select(
-  //     "id, created_at, startDate, endDate, numNights, numGuests, totalPrice, guestId, cabinId, cabins(name, image)"
-  //   )
-  //   .eq("guestId", Number(guestId))
-  //   .order("startDate");
+
   const { data, error, count } = await supabase
     .from("bookings")
     .select("*")
     .eq("guestId", Number(guestId))
     .order("created_at", { ascending: false });
 
-  console.log("from data-service getBookings data", data);
 
   if (error) {
     console.error(error);
@@ -186,7 +177,7 @@ export async function getCountries() {
     }
 
     const countries = await res.json();
-    console.log("Fetched countries:", countries);
+
     return countries;
   } catch (error) {
     console.error("Error in getCountries:", error.message);

@@ -1,18 +1,15 @@
 "use client";
-import { renderWithProps } from "@/app/_components/RenderWithProps";
+
 import { updateProfile } from "@/app/_lib/actions";
 import Image from "next/image";
 import React, { useState } from "react";
 import { useFormStatus } from "react-dom";
+
 function UpdateProfileForm({ guest, countries }) {
-  // console.log("from UpdateProfileForm guest:", guest);
-  // const countryFlag = "/pt.jpg";
-  // const nationality = "portugal";
   const [selectedCountry, setSelectedCountry] = useState(
     `${guest.nationality}%${guest.countryflag}`
   );
 
-  // console.log("selectedCountry", selectedCountry);
   const handleCountryChange = (event) => {
     setSelectedCountry(event.target.value);
   };
@@ -46,14 +43,16 @@ function UpdateProfileForm({ guest, countries }) {
         <div className="space-y-2">
           <div className="flex items-center justify-between ">
             <label htmlFor="nationality">Where are you from?</label>
-            <div className="flex relative h-5 w-8 ml-3">
-              <Image
-                fill
-                src={selectedCountry.split("%")[1]}
-                alt="Country flag"
-                className="h-5 rounded-sm object-cover"
-              />
-            </div>
+            {selectedCountry.split("%")[1] ? (
+              <div className="flex relative h-5 w-8 ml-3">
+                <Image
+                  fill
+                  src={selectedCountry.split("%")[1]}
+                  alt="Country flag"
+                  className="h-5 rounded-sm object-cover"
+                />
+              </div>
+            ) : null}
           </div>
 
           <select
@@ -95,15 +94,7 @@ function UpdateProfileForm({ guest, countries }) {
 function Button() {
   // This hook must be called inside a form element Not just in the form component
   const formState = useFormStatus();
-  /*
-  {
-    "pending": false,
-    "data": null,
-    "method": null,
-    "action": null
-}
-  */
-  console.log("formState", formState);
+
   return (
     <button
       disabled={formState.pending}
