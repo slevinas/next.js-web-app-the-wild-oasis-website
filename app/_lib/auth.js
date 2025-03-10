@@ -56,22 +56,28 @@ const authConfig = {
       try {
         const guestInfo = await getOrCreateGuest(user.email, user.name);
         console.log("Sign-in successful for guest:", guestInfo);
+        if (!guestInfo) {
+          throw new Error("Guest could not be found or created");
+          
+        }
+         // Add the guest ID to the user object for the jwt callback
+         user.guestId = guestInfo.id;
         return true;
       } catch (error) {
         console.error("Sign-in error:", error.message);
         return false;
       }
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       // console.log("JWT callback token:", token);
       console.log("JWT callback user:", user);
       // console.log("JWT callback account:", account);
 
       if (user) {
-        const userId = parseInt(user.id, 10);
-        if (!isNaN(userId)) {
-          console.log("JWT callback adding userId and role to token:", userId);
-          token.id = userId;
+        const guestId = parseInt(user.guestId, 10);
+        if (!isNaN(guestId)) {
+          console.log("JWT callback adding userId and role to token:", guestId);
+          token.id = guestId;
           token.role = "guest";
         } else {
           console.error(
@@ -90,7 +96,7 @@ const authConfig = {
           throw new Error("Token is missing required properties.");
         }
 
-        session.user.id = token.id; // Use the ID from the token
+        session.user.guestId = token.id; // Use the ID from the token
         session.user.role = token.role; // Use the role from the token
 
         console.log("Session created using JWT token:", session);
