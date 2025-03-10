@@ -62,46 +62,15 @@ const authConfig = {
         return false;
       }
     },
-    async session({ session, token }) {
-      try {
-        if (!session?.user?.email) {
-          throw new Error("Session user email is missing");
-        }
-        const guestInfo = await getOrCreateGuest(
-          session.user.email,
-          session.user.name
-        );
-        console.log(
-          "Fetched guest ID:",
-          guestInfo.id,
-          "Type:",
-          typeof guestInfo.id
-        );
-        // Ensure the guest ID is a BIGINT and not a UUID
-        const guestId = Number(guestInfo.id);
-        if (isNaN(guestId)) {
-          console.error(
-            "Invalid guest ID format. Expected a BIGINT, received:",
-            guestInfo.id
-          );
-          return null;
-        }
+    async jwt({ token, user, account }) {
+      // console.log("JWT callback token:", token);
+      console.log("JWT callback user:", user);
+      // console.log("JWT callback account:", account);
 
-        session.user.guestId = guestId;
-        session.user.role = "guest";
-        session.user.id = guestId;
-
-        console.log("Session created with BIGINT ID:", session);
-        return session;
-      } catch (error) {
-        console.error("Session error:", error.message);
-        return null;
-      }
-    },
-    async jwt({ token, user }) {
       if (user) {
         const userId = parseInt(user.id, 10);
         if (!isNaN(userId)) {
+          console.log("JWT callback adding userId and role to token:", userId);
           token.id = userId;
           token.role = "guest";
         } else {
@@ -112,6 +81,24 @@ const authConfig = {
         }
       }
       return token;
+    },
+    async session({ session, token }) {
+      console.log("Session callback token:", token);
+
+      try {
+        if (!token?.id || !token?.role) {
+          throw new Error("Token is missing required properties.");
+        }
+
+        session.user.id = token.id; // Use the ID from the token
+        session.user.role = token.role; // Use the role from the token
+
+        console.log("Session created using JWT token:", session);
+        return session;
+      } catch (error) {
+        console.error("Session error:", error.message);
+        return null;
+      }
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
