@@ -57,12 +57,12 @@ export default async function Navigation() {
               href="/account"
               className="hover:text-accent-400 transition-colors flex items-center gap-4"
             >
-              <div className="object-cover relative scale-[1.15] -translate-x-3">
+              <div className="relative h-10 w-10">
                 <Image
                   src={sessionFromNextAuth.user.image}
                   fill
                   alt="Profile picture"
-                  className="h-10 w-10 rounded-full"
+                  className="h-10 w-10 rounded-full object-cover"
                   referrerPolicy="no-referrer"
                 />
               </div>
