@@ -14,4 +14,8 @@ export const config = {
   matcher: ["/account"],
 };
 
-export const middleware = auth;
+// export const middleware = auth;
+export const middleware = (request) => {
+  console.log('Middleware running on', request.url);
+  return auth(request);
+};
