@@ -55,13 +55,12 @@ const authConfig = {
     async signIn({ user }) {
       try {
         const guestInfo = await getOrCreateGuest(user.email, user.name);
-        console.log("Sign-in successful for guest:", guestInfo);
+
         if (!guestInfo) {
           throw new Error("Guest could not be found or created");
-          
         }
-         // Add the guest ID to the user object for the jwt callback
-         user.guestId = guestInfo.id;
+        // Add the guest ID to the user object for the jwt callback
+        user.guestId = guestInfo.id;
         return true;
       } catch (error) {
         console.error("Sign-in error:", error.message);
@@ -69,14 +68,9 @@ const authConfig = {
       }
     },
     async jwt({ token, user }) {
-      // console.log("JWT callback token:", token);
-      console.log("JWT callback user:", user);
-      // console.log("JWT callback account:", account);
-
       if (user) {
         const guestId = parseInt(user.guestId, 10);
         if (!isNaN(guestId)) {
-          console.log("JWT callback adding userId and role to token:", guestId);
           token.id = guestId;
           token.role = "guest";
         } else {
@@ -89,8 +83,6 @@ const authConfig = {
       return token;
     },
     async session({ session, token }) {
-      console.log("Session callback token:", token);
-
       try {
         if (!token?.id || !token?.role) {
           throw new Error("Token is missing required properties.");
@@ -99,7 +91,6 @@ const authConfig = {
         session.user.guestId = token.id; // Use the ID from the token
         session.user.role = token.role; // Use the role from the token
 
-        console.log("Session created using JWT token:", session);
         return session;
       } catch (error) {
         console.error("Session error:", error.message);
@@ -108,7 +99,7 @@ const authConfig = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV !== "production",
+  // debug: process.env.NODE_ENV !== "production",
   pages: {
     signIn: "/login",
     error: "/login", // Redirect to login page on error

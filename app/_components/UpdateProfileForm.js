@@ -1,21 +1,15 @@
 "use client";
-import { renderWithProps } from "@/app/_components/RenderWithProps";
+
 import { updateProfile } from "@/app/_lib/actions";
 import Image from "next/image";
 import React, { useState } from "react";
 import { useFormStatus } from "react-dom";
 
-
 function UpdateProfileForm({ guest, countries }) {
-  // console.log("from UpdateProfileForm countries:", countries);
-  // console.log("from UpdateProfileForm guest:", guest);
-  // const countryFlag = "/pt.jpg";
-  // const nationality = "portugal";
   const [selectedCountry, setSelectedCountry] = useState(
     `${guest.nationality}%${guest.countryflag}`
   );
 
-  // console.log("selectedCountry", selectedCountry);
   const handleCountryChange = (event) => {
     setSelectedCountry(event.target.value);
   };
@@ -100,15 +94,7 @@ function UpdateProfileForm({ guest, countries }) {
 function Button() {
   // This hook must be called inside a form element Not just in the form component
   const formState = useFormStatus();
-  /*
-  {
-    "pending": false,
-    "data": null,
-    "method": null,
-    "action": null
-}
-  */
-  console.log("formState", formState);
+
   return (
     <button
       disabled={formState.pending}
